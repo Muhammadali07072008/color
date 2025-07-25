@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Document</title>
+  <style>
+    body {
+  font-family: Arial, sans-serif;
+  background: #f0f0f0;
+  text-align: center;
+  padding: 30px;
+}
+
+.results {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 500px;
+  margin: auto;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+input {
+  width: 20%;
+  padding: 10px;
+  font-size: 16px;
+}
+
+button {
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;  
+}
+
+
+
+
+
+
+  </style>
+</head>
+<body>
+  <h2> Kitob Qidirish</h2>
+  <input type="text" id="searchInput" placeholder="Kitob nomini kiriting..." />
+  <button id="searchBtn"> Qidirish</button>
+
+  <div id="results"></div>
+
+  <script>
+    document.getElementById('searchBtn').addEventListener('click', () => {
+      const query = document.getElementById('searchInput').value.trim();
+      const natijalar = document.getElementById('results');
+      natijalar.innerHTML = '';
+
+      if (!query) {
+        alert('Iltimos, kitob nomini kiriting!');
+        return;
+      }
+
+      const url =` https://openlibrary.org/search.json?q=${encodeURIComponent(query)}`;
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          if (!data.docs || data.docs.length === 0) {
+            natijalar.innerHTML = '<p>Hech qanday natija topilmadi.</p>';
+            return;
+          }
+
+          data.docs.slice(0, 5).forEach(book => {
+            const title = book.title || 'Noma\'lum nom';
+            const authors = book.author_name ? book.author_name.join(', ') : 'Muallifi noma\'lum';
+            const yil = book.first_publish_year || 'Chiqarilgan yili noma\'lum';
+
+            const html = `
+              <div>
+                <h3>${title}</h3>
+                <p><strong>Muallif(lar):</strong> ${authors}</p>
+                <p><strong>Chiqarilgan yili:</strong> ${yil}</p>
+              </div>
+            `;
+            natijalar.insertAdjacentHTML('beforeend', html);
+          });
+        })
+        .catch(error => {
+          alert(' Xatolik yuz berdi: ' + error.message);
+        });
+    });
+  </script>
+</body>
+</html>
